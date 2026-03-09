@@ -2,8 +2,8 @@ export interface Project {
   id: string;
   name: string;
   description: string;
-  localPath: string;
-  githubRepo: string;
+  localPath: string | null;
+  githubRepo: string | null;
   railwayUrl?: string;
   liveUrl: string;
   stack: string[];
