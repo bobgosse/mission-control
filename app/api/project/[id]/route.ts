@@ -4,9 +4,9 @@ import { getLatestCommit } from '@/lib/github';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const projectId = params.id;
+  const { id: projectId } = await params;
   const project = projects.find(p => p.id === projectId);
 
   if (!project) {
