@@ -8,7 +8,7 @@ A centralized dashboard to monitor and manage all your film and AI projects with
 
 ✅ **Project Cards** - Visual overview of all projects  
 ✅ **Live GitHub Data** - Latest commits, authors, timestamps  
-✅ **Deployment Status** - Real-time Railway deployment info (coming soon)  
+✅ **Railway Deployment Status** - Real-time build status, deploy times, build duration  
 ✅ **Quick Actions** - One-click access to live sites, GitHub, Railway  
 ✅ **Stack Overview** - See tech stack at a glance  
 ✅ **Auto-refresh** - Data updates every 5 minutes  
@@ -49,10 +49,17 @@ npm install
 GITHUB_TOKEN=your_github_token_here
 ```
 
-**Railway Token (Phase 2 - Coming Soon):**
-```bash
-RAILWAY_TOKEN=your_railway_token_here
-```
+**Railway Token (Phase 2):**
+
+See [RAILWAY-SETUP.md](./RAILWAY-SETUP.md) for detailed instructions on:
+- Getting your Railway API token
+- Finding Railway project UUIDs
+- Adding them to the configuration
+
+Quick version:
+1. Get token at https://railway.app/account/tokens
+2. Add to `.env.local`: `RAILWAY_TOKEN=railway_xxxxx`
+3. Add project IDs to `lib/projects.ts`
 
 ### 3. Run Development Server
 
@@ -121,14 +128,14 @@ npm run start
 ## Future Enhancements
 
 - [x] GitHub API integration (latest commits)
-- [ ] Railway API integration (deployment status)
+- [x] Railway API integration (deployment status)
 - [ ] Manual refresh button
-- [ ] Project health indicators
 - [ ] Search/filter functionality
 - [ ] Quick dev commands (open in VS Code, run locally)
-- [ ] Recent deployment history
+- [ ] Deployment history timeline
 - [ ] Traffic/analytics overview
 - [ ] Uptime monitoring
+- [ ] Vercel deployment status (for Professor Gosse Site)
 
 ## Troubleshooting
 

@@ -2,6 +2,7 @@
 
 import { Project } from '@/lib/projects';
 import { useEffect, useState } from 'react';
+import { getStatusColor, formatBuildDuration } from '@/lib/railway';
 
 interface ProjectCardProps {
   project: Project;
@@ -14,6 +15,13 @@ interface ProjectData {
     author: string;
     date: string;
     url: string;
+  } | null;
+  railway: {
+    status: string;
+    createdAt: string;
+    finishedAt?: string;
+    buildDuration?: number;
+    url?: string;
   } | null;
 }
 
@@ -70,6 +78,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     return 'just now';
   }
 
+  const railwayStatusColor = data?.railway ? getStatusColor(data.railway.status) : null;
+
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 hover:border-slate-700 transition-colors">
       {/* Header */}
@@ -82,6 +92,24 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           {project.status}
         </span>
       </div>
+
+      {/* Railway Deployment Status */}
+      {!loading && data?.railway && railwayStatusColor && (
+        <div className={`mb-4 p-3 rounded border ${railwayStatusColor.bg} ${railwayStatusColor.border}`}>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">{railwayStatusColor.emoji}</span>
+            <span className={`text-sm font-medium ${railwayStatusColor.text}`}>
+              {data.railway.status}
+            </span>
+          </div>
+          <div className="text-xs text-slate-400 space-y-1">
+            <div>Deployed {formatTimeAgo(data.railway.createdAt)}</div>
+            {data.railway.buildDuration && (
+              <div>Build time: {formatBuildDuration(data.railway.buildDuration)}</div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* GitHub Commit Info */}
       {!loading && data?.github && (
@@ -105,10 +133,20 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
       )}
 
-      {loading && project.githubRepo && (
-        <div className="mb-4 p-3 bg-slate-800/50 rounded border border-slate-700 animate-pulse">
-          <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
-          <div className="h-3 bg-slate-700 rounded w-1/2"></div>
+      {loading && (project.githubRepo || project.railwayProjectId) && (
+        <div className="mb-4 space-y-3">
+          {project.railwayProjectId && (
+            <div className="p-3 bg-slate-800/50 rounded border border-slate-700 animate-pulse">
+              <div className="h-4 bg-slate-700 rounded w-2/3 mb-2"></div>
+              <div className="h-3 bg-slate-700 rounded w-1/2"></div>
+            </div>
+          )}
+          {project.githubRepo && (
+            <div className="p-3 bg-slate-800/50 rounded border border-slate-700 animate-pulse">
+              <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-slate-700 rounded w-1/2"></div>
+            </div>
+          )}
         </div>
       )}
 

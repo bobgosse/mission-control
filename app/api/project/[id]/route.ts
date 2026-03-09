@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { projects } from '@/lib/projects';
 import { getLatestCommit } from '@/lib/github';
+import { getLatestDeployment } from '@/lib/railway';
 
 export async function GET(
   request: NextRequest,
@@ -19,8 +20,15 @@ export async function GET(
     githubData = await getLatestCommit(project.githubRepo);
   }
 
+  // Fetch Railway data
+  let railwayData = null;
+  if (project.railwayProjectId) {
+    railwayData = await getLatestDeployment(project.railwayProjectId);
+  }
+
   return NextResponse.json({
     project,
     github: githubData,
+    railway: railwayData,
   });
 }

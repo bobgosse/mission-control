@@ -5,6 +5,7 @@ export interface Project {
   localPath: string | null;
   githubRepo: string | null;
   railwayUrl?: string;
+  railwayProjectId?: string; // Railway project UUID for API
   liveUrl: string;
   stack: string[];
   status: 'active' | 'deployed' | 'development' | 'maintenance';
