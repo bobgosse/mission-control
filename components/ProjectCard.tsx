@@ -1,18 +1,74 @@
 'use client';
 
 import { Project } from '@/lib/projects';
+import { useEffect, useState } from 'react';
 
 interface ProjectCardProps {
   project: Project;
 }
 
+interface ProjectData {
+  github: {
+    sha: string;
+    message: string;
+    author: string;
+    date: string;
+    url: string;
+  } | null;
+}
+
 export default function ProjectCard({ project }: ProjectCardProps) {
+  const [data, setData] = useState<ProjectData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch(`/api/project/${project.id}`);
+        if (response.ok) {
+          const result = await response.json();
+          setData(result);
+        }
+      } catch (error) {
+        console.error('Error fetching project data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [project.id]);
+
   const statusColors = {
     deployed: 'bg-green-500/20 text-green-400 border-green-500/30',
     active: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     development: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
     maintenance: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
   };
+
+  function formatTimeAgo(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    const intervals = {
+      year: 31536000,
+      month: 2592000,
+      week: 604800,
+      day: 86400,
+      hour: 3600,
+      minute: 60,
+    };
+
+    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+      const interval = Math.floor(seconds / secondsInUnit);
+      if (interval >= 1) {
+        return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+      }
+    }
+
+    return 'just now';
+  }
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 hover:border-slate-700 transition-colors">
@@ -26,6 +82,35 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           {project.status}
         </span>
       </div>
+
+      {/* GitHub Commit Info */}
+      {!loading && data?.github && (
+        <div className="mb-4 p-3 bg-slate-800/50 rounded border border-slate-700">
+          <div className="flex items-start gap-2">
+            <span className="text-slate-400 text-xs">📝</span>
+            <div className="flex-1 min-w-0">
+              <a
+                href={data.github.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-slate-300 hover:text-white line-clamp-1 block"
+              >
+                {data.github.message}
+              </a>
+              <p className="text-xs text-slate-500 mt-1">
+                {formatTimeAgo(data.github.date)} · {data.github.sha}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {loading && project.githubRepo && (
+        <div className="mb-4 p-3 bg-slate-800/50 rounded border border-slate-700 animate-pulse">
+          <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
+          <div className="h-3 bg-slate-700 rounded w-1/2"></div>
+        </div>
+      )}
 
       {/* Stack */}
       <div className="mb-4">

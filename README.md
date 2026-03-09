@@ -2,15 +2,16 @@
 
 **Bob Gosse's Project Dashboard**
 
-A centralized dashboard to monitor and manage all your film and AI projects.
+A centralized dashboard to monitor and manage all your film and AI projects with **live GitHub and Railway integration**.
 
 ## Features
 
 ✅ **Project Cards** - Visual overview of all projects  
-✅ **Live Status** - Deployment status indicators  
+✅ **Live GitHub Data** - Latest commits, authors, timestamps  
+✅ **Deployment Status** - Real-time Railway deployment info (coming soon)  
 ✅ **Quick Actions** - One-click access to live sites, GitHub, Railway  
 ✅ **Stack Overview** - See tech stack at a glance  
-✅ **Local Paths** - Quick reference to project locations  
+✅ **Auto-refresh** - Data updates every 5 minutes  
 
 ## Projects Tracked
 
@@ -23,20 +24,63 @@ A centralized dashboard to monitor and manage all your film and AI projects.
 
 ## Setup
 
-**First time setup:**
+### 1. Install Dependencies
 
 ```bash
 # Fix npm cache permissions (if needed)
 sudo chown -R $(id -u):$(id -g) "$HOME/.npm"
 
-# Install dependencies
+# Install
 npm install
+```
 
-# Run development server
+### 2. Configure API Tokens
+
+**GitHub Token (Required for live commit data):**
+
+1. Go to https://github.com/settings/tokens
+2. Click "Generate new token (classic)"
+3. Name: `mission-control`
+4. Scopes: Select `repo` (read-only access)
+5. Generate token and copy it
+
+**Add to `.env.local`:**
+```bash
+GITHUB_TOKEN=your_github_token_here
+```
+
+**Railway Token (Phase 2 - Coming Soon):**
+```bash
+RAILWAY_TOKEN=your_railway_token_here
+```
+
+### 3. Run Development Server
+
+```bash
 npm run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000)
+
+## Deploy to Railway
+
+### Environment Variables
+
+In Railway project settings, add:
+
+```
+GITHUB_TOKEN=your_github_token_here
+```
+
+### Deploy
+
+```bash
+git add .
+git commit -m "your message"
+git push
+```
+
+Railway will auto-deploy.
 
 ## Build for Production
 
@@ -45,25 +89,59 @@ npm run build
 npm run start
 ```
 
-## Deploy to Railway
-
-1. Push to GitHub
-2. Connect repo to Railway
-3. Railway will auto-detect Next.js and deploy
-
 ## Tech Stack
 
-- **Next.js 16** - React framework
+- **Next.js 16** - React framework with App Router
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
-- **Dark Theme** - Matches your other apps
+- **GitHub API** - Live commit data
+- **Railway API** - Deployment status (coming soon)
+
+## API Integration
+
+### GitHub API
+- Fetches latest commit for each repo
+- Shows commit message, author, timestamp
+- Caches for 5 minutes (revalidates automatically)
+- Falls back gracefully if token missing or rate limited
+
+### Railway API (Coming Soon)
+- Live deployment status
+- Build duration
+- Last deploy time
+- Health checks
+
+## How It Works
+
+1. **Server-Side Data Fetching** - API routes fetch from GitHub/Railway
+2. **Client-Side Display** - React components render with loading states
+3. **Automatic Caching** - Next.js caches API responses (5 min)
+4. **Error Handling** - Graceful fallbacks if APIs fail
 
 ## Future Enhancements
 
-- [ ] Railway API integration (live deployment status)
-- [ ] GitHub API integration (recent commits, activity)
+- [x] GitHub API integration (latest commits)
+- [ ] Railway API integration (deployment status)
+- [ ] Manual refresh button
 - [ ] Project health indicators
 - [ ] Search/filter functionality
 - [ ] Quick dev commands (open in VS Code, run locally)
 - [ ] Recent deployment history
 - [ ] Traffic/analytics overview
+- [ ] Uptime monitoring
+
+## Troubleshooting
+
+**"No commit data showing"**
+- Check that `GITHUB_TOKEN` is set in `.env.local`
+- Verify token has `repo` scope
+- Check browser console for API errors
+
+**"Build failing on Railway"**
+- Ensure `GITHUB_TOKEN` is set in Railway environment variables
+- Check Railway build logs for specific errors
+
+**"Rate limited by GitHub"**
+- GitHub allows 60 requests/hour without token
+- 5,000 requests/hour with token
+- Dashboard caches for 5 minutes to minimize requests
