@@ -6,7 +6,7 @@ export interface RailwayDeployment {
   url?: string;
 }
 
-const RAILWAY_API = 'https://backboard.railway.app/graphql';
+const RAILWAY_API = 'https://backboard.railway.com/graphql/v2';
 
 export async function getLatestDeployment(projectId: string): Promise<RailwayDeployment | null> {
   if (!projectId) return null;
@@ -19,17 +19,14 @@ export async function getLatestDeployment(projectId: string): Promise<RailwayDep
 
   try {
     const query = `
-      query project($projectId: String!) {
-        project(id: $projectId) {
-          deployments(first: 1) {
-            edges {
-              node {
-                id
-                status
-                createdAt
-                completedAt
-                url
-              }
+      query deployments($projectId: String!) {
+        deployments(input: { projectId: $projectId }, first: 1) {
+          edges {
+            node {
+              id
+              status
+              createdAt
+              url
             }
           }
         }
@@ -55,27 +52,19 @@ export async function getLatestDeployment(projectId: string): Promise<RailwayDep
     }
 
     const data = await response.json();
-    
+
     if (data.errors) {
       console.error('Railway GraphQL errors:', data.errors);
       return null;
     }
 
-    const deployment = data?.data?.project?.deployments?.edges?.[0]?.node;
+    const deployment = data?.data?.deployments?.edges?.[0]?.node;
     if (!deployment) return null;
-
-    const createdAt = new Date(deployment.createdAt);
-    const completedAt = deployment.completedAt ? new Date(deployment.completedAt) : null;
-    const buildDuration = completedAt 
-      ? Math.floor((completedAt.getTime() - createdAt.getTime()) / 1000)
-      : null;
 
     return {
       status: deployment.status,
       createdAt: deployment.createdAt,
-      finishedAt: deployment.completedAt,
-      buildDuration: buildDuration || undefined,
-      url: deployment.url,
+      url: deployment.url || undefined,
     };
   } catch (error) {
     console.error('Error fetching Railway deployment:', error);
