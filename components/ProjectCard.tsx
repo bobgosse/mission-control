@@ -187,9 +187,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </a>
           )}
 
-          {project.railwayUrl && (
+          {project.railwayProjectId && (
             <a
-              href={`https://railway.app/project/${project.railwayUrl}`}
+              href={`https://railway.com/project/${project.railwayProjectId}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-center bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded text-sm transition-colors"
