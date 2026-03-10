@@ -68,7 +68,7 @@ export const projects: Project[] = [
     githubRepo: 'bobgosse/mission-control',
     railwayUrl: 'mission-control-production',
     railwayProjectId: 'fbe5ea65-68f7-4003-aca6-f620a1323ba5',
-    liveUrl: 'https://mission-control-production.up.railway.app',
+    liveUrl: 'https://mission-control-production-production.up.railway.app',
     stack: ['Next.js 16', 'TypeScript', 'Tailwind', 'GitHub API', 'Railway API'],
     status: 'deployed',
   },
